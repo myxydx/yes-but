@@ -2,394 +2,350 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>YES / BUT</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0f0f0f;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32px 16px;
-  }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px 48px;
+}
 
-  h1 {
-    font-size: 2.4rem;
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #4ade80, #f97316);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #4ade80, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .subtitle {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 40px;
-    letter-spacing: 0.05em;
-  }
+.subtitle {
+  color: #555;
+  font-size: 0.82rem;
+  margin-bottom: 28px;
+  letter-spacing: 0.04em;
+}
 
-  .upload-row {
-    display: flex;
-    gap: 16px;
-    width: 100%;
-    max-width: 720px;
-    margin-bottom: 24px;
-  }
+/* ── Upload ── */
+.upload-row {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 16px;
+}
 
-  .upload-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+.upload-card { flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
-  .label-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 32px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    align-self: flex-start;
-  }
+.label-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 28px;
+  border-radius: 7px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+.label-badge.yes { background: #4ade80; color: #000; }
+.label-badge.but { background: #f97316; color: #fff; }
 
-  .label-badge.yes {
-    background: #4ade80;
-    color: #000;
-  }
+.drop-zone {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px dashed #2a2a2a;
+  border-radius: 14px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #161616;
+}
+.drop-zone:hover, .drop-zone.drag-over { background: #1e1e1e; }
+.drop-zone.yes-zone:hover, .drop-zone.yes-zone.drag-over { border-color: #4ade80; }
+.drop-zone.but-zone:hover, .drop-zone.but-zone.drag-over { border-color: #f97316; }
+.drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.drop-icon { font-size: 1.8rem; opacity: 0.3; pointer-events: none; }
+.drop-hint { font-size: 0.72rem; color: #444; text-align: center; pointer-events: none; padding: 0 10px; line-height: 1.5; }
+.preview-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; display: none; }
+.preview-img.active { display: block; }
+.clear-btn {
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px; border-radius: 50%; border: none;
+  background: rgba(0,0,0,0.65); color: #fff; font-size: 0.75rem;
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+  z-index: 10; backdrop-filter: blur(4px);
+}
+.clear-btn.visible { display: flex; }
 
-  .label-badge.but {
-    background: #f97316;
-    color: #fff;
-  }
+/* ── Options ── */
+.options-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  max-width: 680px;
+  background: #161616;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+.opt-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
+.opt-group label { font-size: 0.7rem; color: #555; letter-spacing: 0.05em; text-transform: uppercase; }
+.opt-group select, .opt-group input[type="range"] {
+  background: #111; border: 1px solid #2a2a2a; color: #fff;
+  border-radius: 7px; padding: 5px 8px; font-size: 0.82rem; outline: none; cursor: pointer;
+}
+.range-val { font-size: 0.75rem; color: #666; }
 
-  .drop-zone {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-    border: 2px dashed #333;
-    border-radius: 16px;
-    cursor: pointer;
-    overflow: hidden;
-    transition: border-color 0.2s, background 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: #1a1a1a;
-  }
+/* ── Canvas ── */
+.canvas-wrap {
+  width: 100%;
+  max-width: 680px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #1a1a1a;
+  position: relative;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+}
 
-  .drop-zone:hover,
-  .drop-zone.drag-over {
-    border-color: #555;
-    background: #222;
-  }
+#mainCanvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+#mainCanvas:active { cursor: grabbing; }
+#mainCanvas.label-mode { cursor: crosshair; }
 
-  .drop-zone.yes-zone:hover,
-  .drop-zone.yes-zone.drag-over { border-color: #4ade80; }
-  .drop-zone.but-zone:hover,
-  .drop-zone.but-zone.drag-over { border-color: #f97316; }
+.canvas-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 24px;
+  pointer-events: none;
+}
 
-  .drop-zone input[type="file"] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
+/* Panel side labels overlay */
+.panel-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: none;
+}
+.panel-labels.visible { display: block; }
+.panel-hint {
+  position: absolute;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.08em;
+  padding: 6px 8px;
+}
 
-  .drop-icon {
-    font-size: 2rem;
-    opacity: 0.35;
-    pointer-events: none;
-  }
+/* ── Toolbar ── */
+.toolbar {
+  width: 100%;
+  max-width: 680px;
+  background: #161616;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+.toolbar.visible { display: flex; }
 
-  .drop-hint {
-    font-size: 0.78rem;
-    color: #555;
-    text-align: center;
-    pointer-events: none;
-    padding: 0 12px;
-    line-height: 1.5;
-  }
+.mode-toggle {
+  display: flex;
+  background: #111;
+  border-radius: 9px;
+  padding: 3px;
+  gap: 3px;
+}
+.mode-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #555;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  letter-spacing: 0.03em;
+}
+.mode-btn.active { background: #252525; color: #fff; }
 
-  .preview-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 14px;
-    display: none;
-  }
+.zoom-section { display: flex; flex-direction: column; gap: 8px; }
+.zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.zoom-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  width: 34px;
+  letter-spacing: 0.06em;
+}
+.zoom-label.yes-c { color: #4ade80; }
+.zoom-label.but-c { color: #f97316; }
+.zoom-row input[type="range"] {
+  flex: 1;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  height: 6px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.zoom-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+.zoom-val { font-size: 0.72rem; color: #555; width: 38px; text-align: right; }
+.reset-btn {
+  width: 26px; height: 26px;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  background: transparent;
+  color: #555;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.reset-btn:hover { color: #fff; border-color: #555; }
 
-  .preview-img.active { display: block; }
+.hint-text {
+  font-size: 0.7rem;
+  color: #383838;
+  text-align: center;
+  line-height: 1.6;
+}
 
-  .clear-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-    font-size: 0.85rem;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    backdrop-filter: blur(4px);
-  }
+/* ── Save ── */
+.save-btn {
+  width: 100%;
+  max-width: 680px;
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  background: linear-gradient(135deg, #4ade80, #f97316);
+  color: #000;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.save-btn:hover { opacity: 0.88; }
+.save-btn:active { transform: scale(0.98); }
+.save-btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none; }
 
-  .clear-btn.visible { display: flex; }
+/* ── Modal ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.93);
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  gap: 16px;
+}
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Options */
-  .options-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    width: 100%;
-    max-width: 720px;
-    margin-bottom: 24px;
-    background: #1a1a1a;
-    border-radius: 14px;
-    padding: 16px 20px;
-  }
-
-  .opt-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
-    min-width: 140px;
-  }
-
-  .opt-group label {
-    font-size: 0.75rem;
-    color: #666;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .opt-group select,
-  .opt-group input[type="range"] {
-    background: #111;
-    border: 1px solid #333;
-    color: #fff;
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 0.85rem;
-    outline: none;
-    cursor: pointer;
-  }
-
-  .opt-group select:focus { border-color: #555; }
-  .range-val { font-size: 0.8rem; color: #888; }
-
-  /* Generate button */
-  .gen-btn {
-    width: 100%;
-    max-width: 720px;
-    height: 52px;
-    border: none;
-    border-radius: 14px;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    background: linear-gradient(135deg, #4ade80, #f97316);
-    color: #000;
-    margin-bottom: 32px;
-  }
-
-  .gen-btn:hover { opacity: 0.9; }
-  .gen-btn:active { transform: scale(0.98); }
-  .gen-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-
-  /* Result */
-  .result-section {
-    width: 100%;
-    max-width: 720px;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .result-section.visible { display: flex; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .result-canvas-wrap {
-    width: 100%;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-  }
-
-  #resultCanvas {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-
-  .save-btn {
-    width: 100%;
-    height: 52px;
-    border: none;
-    border-radius: 14px;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    background: #fff;
-    color: #000;
-    transition: opacity 0.2s, transform 0.1s;
-  }
-
-  .save-btn:hover { opacity: 0.88; }
-  .save-btn:active { transform: scale(0.98); }
-
-  .tip {
-    font-size: 0.75rem;
-    color: #444;
-    text-align: center;
-  }
-
-  /* Modal */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.92);
-    z-index: 100;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    gap: 16px;
-    animation: fadeIn 0.2s ease;
-  }
-
-  .modal-overlay.open { display: flex; }
-
-  .modal-img-wrap {
-    max-width: 100%;
-    max-height: 75vh;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 48px rgba(0,0,0,0.8);
-  }
-
-  .modal-img-wrap img {
-    display: block;
-    max-width: 100%;
-    max-height: 75vh;
-    object-fit: contain;
-    -webkit-touch-callout: default;
-  }
-
-  .modal-hint {
-    font-size: 0.9rem;
-    color: #aaa;
-    text-align: center;
-    line-height: 1.6;
-  }
-
-  .modal-hint strong { color: #fff; }
-
-  .modal-actions {
-    display: flex;
-    gap: 12px;
-  }
-
-  .modal-close {
-    padding: 12px 28px;
-    border-radius: 12px;
-    border: 1px solid #444;
-    background: transparent;
-    color: #aaa;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
-  }
-
-  .modal-close:hover { border-color: #666; color: #fff; }
-
-  .modal-dl {
-    padding: 12px 28px;
-    border-radius: 12px;
-    border: none;
-    background: #fff;
-    color: #000;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .modal-dl:hover { opacity: 0.85; }
-
-  /* hide desktop download on touch devices */
-  @media (hover: none) and (pointer: coarse) {
-    .modal-dl { display: none; }
-  }
-
-  @media (max-width: 480px) {
-    h1 { font-size: 1.8rem; }
-    .upload-row { gap: 10px; }
-  }
+.modal-img-wrap {
+  max-width: 100%;
+  max-height: 72vh;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.8);
+}
+.modal-img-wrap img {
+  display: block;
+  max-width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  -webkit-touch-callout: default;
+}
+.modal-hint { font-size: 0.88rem; color: #999; text-align: center; line-height: 1.7; }
+.modal-hint strong { color: #fff; }
+.modal-actions { display: flex; gap: 10px; }
+.modal-close {
+  padding: 11px 26px; border-radius: 11px;
+  border: 1px solid #333; background: transparent; color: #888;
+  font-size: 0.92rem; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+}
+.modal-close:hover { border-color: #555; color: #fff; }
+.modal-dl {
+  padding: 11px 26px; border-radius: 11px; border: none;
+  background: #fff; color: #000; font-size: 0.92rem; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.modal-dl:hover { opacity: 0.85; }
+@media (hover: none) and (pointer: coarse) { .modal-dl { display: none; } }
 </style>
 </head>
 <body>
 
 <h1>YES / BUT</h1>
-<p class="subtitle">上传两张图，自动合成</p>
+<p class="subtitle">上传图片 · 拖拽调整位置 · 双指/滚轮缩放</p>
 
-<!-- Upload row -->
+<!-- Upload -->
 <div class="upload-row">
-  <!-- YES -->
   <div class="upload-card">
     <span class="label-badge yes">YES</span>
     <div class="drop-zone yes-zone" id="yesZone">
       <input type="file" accept="image/*" id="yesInput">
       <div class="drop-icon">🖼️</div>
-      <div class="drop-hint">点击或拖入图片</div>
+      <div class="drop-hint">点击或拖入</div>
       <img class="preview-img" id="yesPreview" alt="">
-      <button class="clear-btn" id="yesClear" title="移除">✕</button>
+      <button class="clear-btn" id="yesClear">✕</button>
     </div>
   </div>
-
-  <!-- BUT -->
   <div class="upload-card">
     <span class="label-badge but">BUT</span>
     <div class="drop-zone but-zone" id="butZone">
       <input type="file" accept="image/*" id="butInput">
       <div class="drop-icon">🖼️</div>
-      <div class="drop-hint">点击或拖入图片</div>
+      <div class="drop-hint">点击或拖入</div>
       <img class="preview-img" id="butPreview" alt="">
-      <button class="clear-btn" id="butClear" title="移除">✕</button>
+      <button class="clear-btn" id="butClear">✕</button>
     </div>
   </div>
 </div>
@@ -409,14 +365,6 @@
     <span class="range-val" id="fontSizeVal">90px</span>
   </div>
   <div class="opt-group">
-    <label>文字位置</label>
-    <select id="optTextPos">
-      <option value="center">居中</option>
-      <option value="topleft">左上角</option>
-      <option value="bottomleft">左下角</option>
-    </select>
-  </div>
-  <div class="opt-group">
     <label>输出宽度</label>
     <select id="optSize">
       <option value="1200">1200px</option>
@@ -426,25 +374,44 @@
   </div>
 </div>
 
-<!-- Generate -->
-<button class="gen-btn" id="genBtn" disabled>生成图片 →</button>
-
-<!-- Result -->
-<div class="result-section" id="resultSection">
-  <div class="result-canvas-wrap">
-    <canvas id="resultCanvas"></canvas>
-  </div>
-  <button class="save-btn" id="saveBtn">保存图片</button>
+<!-- Canvas -->
+<div class="canvas-wrap" id="canvasWrap">
+  <canvas id="mainCanvas"></canvas>
+  <div class="canvas-placeholder" id="placeholder">上传两张图片后，在这里实时预览并拖拽编辑</div>
 </div>
 
-<!-- Save modal -->
-<div class="modal-overlay" id="saveModal">
-  <div class="modal-img-wrap">
-    <img id="modalImg" alt="YES/BUT">
+<!-- Toolbar -->
+<div class="toolbar" id="toolbar">
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="image">移动图片</button>
+    <button class="mode-btn" data-mode="label">移动标签</button>
   </div>
+  <div class="zoom-section">
+    <div class="zoom-row">
+      <span class="zoom-label yes-c">YES</span>
+      <input type="range" id="zoomYes" min="50" max="400" value="100" step="5">
+      <span class="zoom-val" id="zoomYesVal">100%</span>
+      <button class="reset-btn" data-reset="yes" title="重置">↺</button>
+    </div>
+    <div class="zoom-row">
+      <span class="zoom-label but-c">BUT</span>
+      <input type="range" id="zoomBut" min="50" max="400" value="100" step="5">
+      <span class="zoom-val" id="zoomButVal">100%</span>
+      <button class="reset-btn" data-reset="but" title="重置">↺</button>
+    </div>
+  </div>
+  <p class="hint-text" id="hintText">拖拽画面调整图片位置 · 滚轮或双指捏合缩放</p>
+</div>
+
+<!-- Save -->
+<button class="save-btn" id="saveBtn" disabled>保存图片</button>
+
+<!-- Modal -->
+<div class="modal-overlay" id="saveModal">
+  <div class="modal-img-wrap"><img id="modalImg" alt="YES/BUT"></div>
   <p class="modal-hint">
     <strong>手机：</strong>长按图片 → 存到相册<br>
-    <strong>电脑：</strong>右键图片另存为，或点下载
+    <strong>电脑：</strong>右键另存为，或点下载
   </p>
   <div class="modal-actions">
     <button class="modal-close" id="modalClose">关闭</button>
@@ -453,221 +420,377 @@
 </div>
 
 <script>
-const state = { yes: null, but: null };
+// ─── State ───────────────────────────────────────────────────────────────────
+const panels = {
+  yes: { img: null, nox: 0, noy: 0, scale: 1, lx: 0.06, ly: 0.88 },
+  but: { img: null, nox: 0, noy: 0, scale: 1, lx: 0.06, ly: 0.88 }
+};
+let mode = 'image'; // 'image' | 'label'
 
-// --- Upload helpers ---
+// ─── Elements ────────────────────────────────────────────────────────────────
+const canvas      = document.getElementById('mainCanvas');
+const ctx         = canvas.getContext('2d');
+const toolbar     = document.getElementById('toolbar');
+const placeholder = document.getElementById('placeholder');
+const saveBtn     = document.getElementById('saveBtn');
+
+// ─── Upload setup ────────────────────────────────────────────────────────────
 function setupZone(zoneId, inputId, previewId, clearId, key) {
-  const zone = document.getElementById(zoneId);
-  const input = document.getElementById(inputId);
+  const zone    = document.getElementById(zoneId);
+  const input   = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
-  const clearBtn = document.getElementById(clearId);
+  const clearBtn= document.getElementById(clearId);
 
   function load(file) {
     if (!file || !file.type.startsWith('image/')) return;
     const reader = new FileReader();
     reader.onload = e => {
-      state[key] = e.target.result;
-      preview.src = e.target.result;
-      preview.classList.add('active');
-      clearBtn.classList.add('visible');
-      checkReady();
+      const img = new Image();
+      img.onload = () => {
+        panels[key].img  = img;
+        panels[key].nox  = 0;
+        panels[key].noy  = 0;
+        panels[key].scale= 1;
+        syncZoomSlider(key);
+        preview.src = e.target.result;
+        preview.classList.add('active');
+        clearBtn.classList.add('visible');
+        onStateChange();
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 
   input.addEventListener('change', () => { if (input.files[0]) load(input.files[0]); });
-
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('drag-over');
-    load(e.dataTransfer.files[0]);
-  });
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); load(e.dataTransfer.files[0]); });
 
   clearBtn.addEventListener('click', e => {
     e.stopPropagation();
-    state[key] = null;
+    panels[key].img = null;
     preview.src = '';
     preview.classList.remove('active');
     clearBtn.classList.remove('visible');
     input.value = '';
-    checkReady();
+    onStateChange();
   });
 }
 
-setupZone('yesZone', 'yesInput', 'yesPreview', 'yesClear', 'yes');
-setupZone('butZone', 'butInput', 'butPreview', 'butClear', 'but');
+setupZone('yesZone','yesInput','yesPreview','yesClear','yes');
+setupZone('butZone','butInput','butPreview','butClear','but');
 
-function checkReady() {
-  document.getElementById('genBtn').disabled = !(state.yes && state.but);
-}
-
-// --- Options ---
+// ─── Options ─────────────────────────────────────────────────────────────────
 const fontSizeSlider = document.getElementById('optFontSize');
-const fontSizeVal = document.getElementById('fontSizeVal');
-fontSizeSlider.addEventListener('input', () => { fontSizeVal.textContent = fontSizeSlider.value + 'px'; });
+document.getElementById('fontSizeVal').textContent = fontSizeSlider.value + 'px';
+fontSizeSlider.addEventListener('input', () => {
+  document.getElementById('fontSizeVal').textContent = fontSizeSlider.value + 'px';
+  render();
+});
+document.getElementById('optLayout').addEventListener('change', render);
+document.getElementById('optSize').addEventListener('change', render);
 
-// --- Generate ---
-document.getElementById('genBtn').addEventListener('click', generate);
+// ─── Zoom sliders ─────────────────────────────────────────────────────────────
+function syncZoomSlider(key) {
+  const el  = document.getElementById(key === 'yes' ? 'zoomYes' : 'zoomBut');
+  const val = document.getElementById(key === 'yes' ? 'zoomYesVal' : 'zoomButVal');
+  el.value = Math.round(panels[key].scale * 100);
+  val.textContent = el.value + '%';
+}
 
-async function loadImage(src) {
-  return new Promise((res, rej) => {
-    const img = new Image();
-    img.onload = () => res(img);
-    img.onerror = rej;
-    img.src = src;
+['yes','but'].forEach(key => {
+  const sliderId = key === 'yes' ? 'zoomYes' : 'zoomBut';
+  const valId    = key === 'yes' ? 'zoomYesVal' : 'zoomButVal';
+  const slider   = document.getElementById(sliderId);
+  const valEl    = document.getElementById(valId);
+
+  slider.addEventListener('input', () => {
+    panels[key].scale = parseInt(slider.value) / 100;
+    valEl.textContent = slider.value + '%';
+    render();
   });
+});
+
+document.querySelectorAll('.reset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.reset;
+    panels[key].scale = 1; panels[key].nox = 0; panels[key].noy = 0;
+    syncZoomSlider(key);
+    render();
+  });
+});
+
+// ─── Mode toggle ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    mode = btn.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+    canvas.classList.toggle('label-mode', mode === 'label');
+    document.getElementById('hintText').textContent = mode === 'image'
+      ? '拖拽画面调整图片位置 · 滚轮或双指捏合缩放'
+      : '拖拽画面调整 YES / BUT 标签位置';
+    render();
+  });
+});
+
+// ─── Layout helpers ───────────────────────────────────────────────────────────
+function getLayout() { return document.getElementById('optLayout').value; }
+function getOutSize() { return parseInt(document.getElementById('optSize').value); }
+
+function getPanelRect(key) {
+  const layout = getLayout();
+  const half   = getOutSize() / 2;
+  const full   = getOutSize();
+  if (layout === 'horizontal') {
+    return key === 'yes'
+      ? { x: 0,    y: 0, w: half, h: half }
+      : { x: half, y: 0, w: half, h: half };
+  } else {
+    return key === 'yes'
+      ? { x: 0, y: 0,    w: half, h: half }
+      : { x: 0, y: half, w: half, h: half };
+  }
 }
 
-async function generate() {
-  const layout   = document.getElementById('optLayout').value;
-  const fontSize = parseInt(fontSizeSlider.value);
-  const textPos  = document.getElementById('optTextPos').value;
-  const outWidth = parseInt(document.getElementById('optSize').value);
-
-  const [imgYes, imgBut] = await Promise.all([loadImage(state.yes), loadImage(state.but)]);
-
-  const canvas = document.getElementById('resultCanvas');
-  const ctx = canvas.getContext('2d');
-
-  // Each panel is a square of half the total width (horizontal) or half height (vertical)
-  const panel = outWidth / 2;
-
-  if (layout === 'horizontal') {
-    canvas.width  = outWidth;
-    canvas.height = panel;
-  } else {
-    canvas.width  = panel;
-    canvas.height = outWidth;
-  }
-
-  // Draw helper: cover-fit image into a rect
-  function drawCover(img, x, y, w, h) {
-    const scale = Math.max(w / img.width, h / img.height);
-    const sw = img.width  * scale;
-    const sh = img.height * scale;
-    const sx = x + (w - sw) / 2;
-    const sy = y + (h - sh) / 2;
-    ctx.drawImage(img, sx, sy, sw, sh);
-  }
-
-  // Clip regions
-  function drawPanel(img, x, y, w, h, label, color) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(x, y, w, h);
-    ctx.clip();
-    drawCover(img, x, y, w, h);
-
-    // Dark gradient overlay for text readability
-    const isTop = textPos === 'topleft';
-    const isCenter = textPos === 'center';
-    let grad;
-    if (isCenter) {
-      grad = ctx.createRadialGradient(x + w/2, y + h/2, 0, x + w/2, y + h/2, Math.max(w,h) * 0.6);
-      grad.addColorStop(0, 'rgba(0,0,0,0.45)');
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
-    } else {
-      const gy0 = isTop ? y : y + h * 0.5;
-      const gy1 = isTop ? y + h * 0.55 : y + h;
-      grad = ctx.createLinearGradient(x, gy0, x, gy1);
-      grad.addColorStop(0, 'rgba(0,0,0,0.55)');
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
-    }
-    ctx.fillStyle = grad;
-    ctx.fillRect(x, y, w, h);
-
-    // Text position
-    let tx, ty;
-    const pad = fontSize * 0.55;
-    if (textPos === 'center') {
-      tx = x + w / 2; ty = y + h / 2;
-    } else if (textPos === 'topleft') {
-      tx = x + pad; ty = y + pad + fontSize * 0.8;
-    } else {
-      tx = x + pad; ty = y + h - pad;
-    }
-
-    // Shadow
-    ctx.shadowColor = 'rgba(0,0,0,0.7)';
-    ctx.shadowBlur = fontSize * 0.3;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = fontSize * 0.06;
-
-    // Text stroke
-    ctx.font = `900 ${fontSize}px -apple-system, 'Helvetica Neue', Arial, sans-serif`;
-    ctx.textAlign = textPos === 'center' ? 'center' : 'left';
-    ctx.textBaseline = textPos === 'center' ? 'middle' : 'alphabetic';
-    ctx.lineWidth = fontSize * 0.08;
-    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-    ctx.strokeText(label, tx, ty);
-
-    // Text fill
-    ctx.fillStyle = color;
-    ctx.fillText(label, tx, ty);
-
-    ctx.restore();
-  }
-
-  if (layout === 'horizontal') {
-    drawPanel(imgYes, 0,     0, panel, panel, 'YES', '#4ade80');
-    drawPanel(imgBut, panel, 0, panel, panel, 'BUT', '#f97316');
-
-    // Divider line
-    ctx.save();
-    ctx.strokeStyle = '#0f0f0f';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(panel, 0);
-    ctx.lineTo(panel, canvas.height);
-    ctx.stroke();
-    ctx.restore();
-  } else {
-    drawPanel(imgYes, 0, 0,     panel, panel, 'YES', '#4ade80');
-    drawPanel(imgBut, 0, panel, panel, panel, 'BUT', '#f97316');
-
-    ctx.save();
-    ctx.strokeStyle = '#0f0f0f';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(0, panel);
-    ctx.lineTo(canvas.width, panel);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  const section = document.getElementById('resultSection');
-  section.classList.add('visible');
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// Map display coords to canvas coords
+function toCanvas(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) * (canvas.width  / rect.width),
+    y: (clientY - rect.top)  * (canvas.height / rect.height)
+  };
 }
 
-// --- Save modal ---
+function whichPanel(cx, cy) {
+  if (getLayout() === 'horizontal') return cx < canvas.width  / 2 ? 'yes' : 'but';
+  return cy < canvas.height / 2 ? 'yes' : 'but';
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function resizeCanvas() {
+  const outSize = getOutSize();
+  const layout  = getLayout();
+  canvas.width  = layout === 'horizontal' ? outSize : outSize / 2;
+  canvas.height = layout === 'horizontal' ? outSize / 2 : outSize;
+}
+
+function render() {
+  resizeCanvas();
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (panels.yes.img) drawPanel('yes');
+  if (panels.but.img) drawPanel('but');
+
+  // divider
+  const layout = getLayout();
+  ctx.save();
+  ctx.strokeStyle = '#0f0f0f';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  if (layout === 'horizontal') {
+    ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height);
+  } else {
+    ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // label mode indicator dots
+  if (mode === 'label') {
+    ['yes','but'].forEach(key => {
+      if (!panels[key].img) return;
+      const r  = getPanelRect(key);
+      const tx = r.x + panels[key].lx * r.w;
+      const ty = r.y + panels[key].ly * r.h;
+      ctx.save();
+      ctx.strokeStyle = key === 'yes' ? '#4ade80' : '#f97316';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(tx - 8, ty - parseInt(fontSizeSlider.value) * 0.6,
+        ctx.measureText(key === 'yes' ? 'YES' : 'BUT').width * (parseInt(fontSizeSlider.value) / 16) + 16,
+        parseInt(fontSizeSlider.value) * 1.2);
+      ctx.restore();
+    });
+  }
+}
+
+function drawPanel(key) {
+  const p    = panels[key];
+  const r    = getPanelRect(key);
+  const fs   = parseInt(fontSizeSlider.value);
+  const label= key === 'yes' ? 'YES' : 'BUT';
+  const color= key === 'yes' ? '#4ade80' : '#f97316';
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(r.x, r.y, r.w, r.h);
+  ctx.clip();
+
+  // image with offset + scale
+  const base  = Math.max(r.w / p.img.width, r.h / p.img.height);
+  const scale = base * p.scale;
+  const iw    = p.img.width  * scale;
+  const ih    = p.img.height * scale;
+  const ix    = r.x + (r.w - iw) / 2 + p.nox * r.w;
+  const iy    = r.y + (r.h - ih) / 2 + p.noy * r.h;
+  ctx.drawImage(p.img, ix, iy, iw, ih);
+
+  // label
+  const tx = r.x + p.lx * r.w;
+  const ty = r.y + p.ly * r.h;
+
+  ctx.font = `900 ${fs}px -apple-system,'Helvetica Neue',Arial,sans-serif`;
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor  = 'rgba(0,0,0,0.75)';
+  ctx.shadowBlur   = fs * 0.28;
+  ctx.shadowOffsetY= fs * 0.05;
+  ctx.lineWidth    = fs * 0.07;
+  ctx.strokeStyle  = 'rgba(0,0,0,0.55)';
+  ctx.strokeText(label, tx, ty);
+  ctx.shadowBlur   = fs * 0.15;
+  ctx.fillStyle    = color;
+  ctx.fillText(label, tx, ty);
+
+  ctx.restore();
+}
+
+// ─── State change ─────────────────────────────────────────────────────────────
+function onStateChange() {
+  const any  = panels.yes.img || panels.but.img;
+  const both = panels.yes.img && panels.but.img;
+  placeholder.style.display = any ? 'none' : '';
+  toolbar.classList.toggle('visible', any);
+  saveBtn.disabled = !both;
+  render();
+}
+
+// ─── Pointer interaction ──────────────────────────────────────────────────────
+let drag = null;
+
+function dragStart(clientX, clientY) {
+  const c   = toCanvas(clientX, clientY);
+  const key = whichPanel(c.x, c.y);
+  if (!panels[key].img) return;
+  const p = panels[key];
+  drag = {
+    key,
+    startCX: clientX, startCY: clientY,
+    startNox: p.nox,  startNoy: p.noy,
+    startLx:  p.lx,   startLy:  p.ly
+  };
+}
+
+function dragMove(clientX, clientY) {
+  if (!drag) return;
+  const rect  = canvas.getBoundingClientRect();
+  const scaleX= canvas.width  / rect.width;
+  const scaleY= canvas.height / rect.height;
+  const dx    = (clientX - drag.startCX) * scaleX;
+  const dy    = (clientY - drag.startCY) * scaleY;
+  const r     = getPanelRect(drag.key);
+  const p     = panels[drag.key];
+
+  if (mode === 'image') {
+    p.nox = drag.startNox + dx / r.w;
+    p.noy = drag.startNoy + dy / r.h;
+  } else {
+    p.lx = Math.max(0, Math.min(0.95, drag.startLx + dx / r.w));
+    p.ly = Math.max(0.05, Math.min(0.97, drag.startLy + dy / r.h));
+  }
+  render();
+}
+
+function dragEnd() { drag = null; }
+
+// Mouse
+canvas.addEventListener('mousedown', e => { e.preventDefault(); dragStart(e.clientX, e.clientY); });
+window.addEventListener('mousemove', e => { if (drag) dragMove(e.clientX, e.clientY); });
+window.addEventListener('mouseup',   () => dragEnd());
+
+// Scroll-to-zoom (desktop)
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const c   = toCanvas(e.clientX, e.clientY);
+  const key = whichPanel(c.x, c.y);
+  if (!panels[key].img) return;
+  const delta = e.deltaY > 0 ? 0.92 : 1.08;
+  panels[key].scale = Math.max(0.5, Math.min(4, panels[key].scale * delta));
+  syncZoomSlider(key);
+  render();
+}, { passive: false });
+
+// Touch
+let touches = {};
+let pinch = null;
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    dragStart(t.clientX, t.clientY);
+    pinch = null;
+  } else if (e.touches.length === 2) {
+    drag = null;
+    const t0 = e.touches[0], t1 = e.touches[1];
+    const dist= Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+    const mx  = (t0.clientX + t1.clientX) / 2;
+    const my  = (t0.clientY + t1.clientY) / 2;
+    const c   = toCanvas(mx, my);
+    const key = whichPanel(c.x, c.y);
+    pinch = { dist, scale0: panels[key].scale, key };
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && !pinch) {
+    const t = e.touches[0];
+    dragMove(t.clientX, t.clientY);
+  } else if (e.touches.length === 2 && pinch) {
+    const t0 = e.touches[0], t1 = e.touches[1];
+    const dist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+    const ratio= dist / pinch.dist;
+    panels[pinch.key].scale = Math.max(0.5, Math.min(4, pinch.scale0 * ratio));
+    syncZoomSlider(pinch.key);
+    render();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (e.touches.length < 2) pinch = null;
+  if (e.touches.length === 0) dragEnd();
+}, { passive: false });
+
+// ─── Save modal ───────────────────────────────────────────────────────────────
 const saveModal = document.getElementById('saveModal');
 const modalImg  = document.getElementById('modalImg');
 
-function openSaveModal() {
-  const canvas = document.getElementById('resultCanvas');
+function openModal() {
   modalImg.src = canvas.toDataURL('image/png');
   saveModal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
-function closeSaveModal() {
+function closeModal() {
   saveModal.classList.remove('open');
   document.body.style.overflow = '';
 }
 
-document.getElementById('saveBtn').addEventListener('click', openSaveModal);
-document.getElementById('modalClose').addEventListener('click', closeSaveModal);
-saveModal.addEventListener('click', e => { if (e.target === saveModal) closeSaveModal(); });
-
+saveBtn.addEventListener('click', openModal);
+document.getElementById('modalClose').addEventListener('click', closeModal);
+saveModal.addEventListener('click', e => { if (e.target === saveModal) closeModal(); });
 document.getElementById('modalDl').addEventListener('click', () => {
   const a = document.createElement('a');
   a.download = 'yes-but.png';
   a.href = modalImg.src;
   a.click();
 });
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+resizeCanvas();
 </script>
 </body>
 </html>

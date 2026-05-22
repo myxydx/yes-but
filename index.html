@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YES / BUT</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f0f0f;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #4ade80, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+    letter-spacing: 0.05em;
+  }
+
+  .upload-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 24px;
+  }
+
+  .upload-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .label-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    align-self: flex-start;
+  }
+
+  .label-badge.yes {
+    background: #4ade80;
+    color: #000;
+  }
+
+  .label-badge.but {
+    background: #f97316;
+    color: #fff;
+  }
+
+  .drop-zone {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px dashed #333;
+    border-radius: 16px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #1a1a1a;
+  }
+
+  .drop-zone:hover,
+  .drop-zone.drag-over {
+    border-color: #555;
+    background: #222;
+  }
+
+  .drop-zone.yes-zone:hover,
+  .drop-zone.yes-zone.drag-over { border-color: #4ade80; }
+  .drop-zone.but-zone:hover,
+  .drop-zone.but-zone.drag-over { border-color: #f97316; }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-icon {
+    font-size: 2rem;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .drop-hint {
+    font-size: 0.78rem;
+    color: #555;
+    text-align: center;
+    pointer-events: none;
+    padding: 0 12px;
+    line-height: 1.5;
+  }
+
+  .preview-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    display: none;
+  }
+
+  .preview-img.active { display: block; }
+
+  .clear-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+  }
+
+  .clear-btn.visible { display: flex; }
+
+  /* Options */
+  .options-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 24px;
+    background: #1a1a1a;
+    border-radius: 14px;
+    padding: 16px 20px;
+  }
+
+  .opt-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .opt-group label {
+    font-size: 0.75rem;
+    color: #666;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .opt-group select,
+  .opt-group input[type="range"] {
+    background: #111;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .opt-group select:focus { border-color: #555; }
+  .range-val { font-size: 0.8rem; color: #888; }
+
+  /* Generate button */
+  .gen-btn {
+    width: 100%;
+    max-width: 720px;
+    height: 52px;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    background: linear-gradient(135deg, #4ade80, #f97316);
+    color: #000;
+    margin-bottom: 32px;
+  }
+
+  .gen-btn:hover { opacity: 0.9; }
+  .gen-btn:active { transform: scale(0.98); }
+  .gen-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  /* Result */
+  .result-section {
+    width: 100%;
+    max-width: 720px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .result-section.visible { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-canvas-wrap {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+
+  #resultCanvas {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .save-btn {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    background: #fff;
+    color: #000;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .save-btn:hover { opacity: 0.88; }
+  .save-btn:active { transform: scale(0.98); }
+
+  .tip {
+    font-size: 0.75rem;
+    color: #444;
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 1.8rem; }
+    .upload-row { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>YES / BUT</h1>
+<p class="subtitle">上传两张图，自动合成</p>
+
+<!-- Upload row -->
+<div class="upload-row">
+  <!-- YES -->
+  <div class="upload-card">
+    <span class="label-badge yes">YES</span>
+    <div class="drop-zone yes-zone" id="yesZone">
+      <input type="file" accept="image/*" id="yesInput">
+      <div class="drop-icon">🖼️</div>
+      <div class="drop-hint">点击或拖入图片</div>
+      <img class="preview-img" id="yesPreview" alt="">
+      <button class="clear-btn" id="yesClear" title="移除">✕</button>
+    </div>
+  </div>
+
+  <!-- BUT -->
+  <div class="upload-card">
+    <span class="label-badge but">BUT</span>
+    <div class="drop-zone but-zone" id="butZone">
+      <input type="file" accept="image/*" id="butInput">
+      <div class="drop-icon">🖼️</div>
+      <div class="drop-hint">点击或拖入图片</div>
+      <img class="preview-img" id="butPreview" alt="">
+      <button class="clear-btn" id="butClear" title="移除">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- Options -->
+<div class="options-row">
+  <div class="opt-group">
+    <label>布局方向</label>
+    <select id="optLayout">
+      <option value="horizontal">左右</option>
+      <option value="vertical">上下</option>
+    </select>
+  </div>
+  <div class="opt-group">
+    <label>字体大小</label>
+    <input type="range" id="optFontSize" min="40" max="180" value="90" step="5">
+    <span class="range-val" id="fontSizeVal">90px</span>
+  </div>
+  <div class="opt-group">
+    <label>文字位置</label>
+    <select id="optTextPos">
+      <option value="center">居中</option>
+      <option value="topleft">左上角</option>
+      <option value="bottomleft">左下角</option>
+    </select>
+  </div>
+  <div class="opt-group">
+    <label>输出宽度</label>
+    <select id="optSize">
+      <option value="1200">1200px</option>
+      <option value="1600">1600px</option>
+      <option value="800">800px</option>
+    </select>
+  </div>
+</div>
+
+<!-- Generate -->
+<button class="gen-btn" id="genBtn" disabled>生成图片 →</button>
+
+<!-- Result -->
+<div class="result-section" id="resultSection">
+  <div class="result-canvas-wrap">
+    <canvas id="resultCanvas"></canvas>
+  </div>
+  <button class="save-btn" id="saveBtn">⬇ 保存图片</button>
+  <p class="tip">手机用户：长按图片可保存到相册</p>
+</div>
+
+<script>
+const state = { yes: null, but: null };
+
+// --- Upload helpers ---
+function setupZone(zoneId, inputId, previewId, clearId, key) {
+  const zone = document.getElementById(zoneId);
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  const clearBtn = document.getElementById(clearId);
+
+  function load(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      state[key] = e.target.result;
+      preview.src = e.target.result;
+      preview.classList.add('active');
+      clearBtn.classList.add('visible');
+      checkReady();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  input.addEventListener('change', () => { if (input.files[0]) load(input.files[0]); });
+
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    load(e.dataTransfer.files[0]);
+  });
+
+  clearBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    state[key] = null;
+    preview.src = '';
+    preview.classList.remove('active');
+    clearBtn.classList.remove('visible');
+    input.value = '';
+    checkReady();
+  });
+}
+
+setupZone('yesZone', 'yesInput', 'yesPreview', 'yesClear', 'yes');
+setupZone('butZone', 'butInput', 'butPreview', 'butClear', 'but');
+
+function checkReady() {
+  document.getElementById('genBtn').disabled = !(state.yes && state.but);
+}
+
+// --- Options ---
+const fontSizeSlider = document.getElementById('optFontSize');
+const fontSizeVal = document.getElementById('fontSizeVal');
+fontSizeSlider.addEventListener('input', () => { fontSizeVal.textContent = fontSizeSlider.value + 'px'; });
+
+// --- Generate ---
+document.getElementById('genBtn').addEventListener('click', generate);
+
+async function loadImage(src) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = src;
+  });
+}
+
+async function generate() {
+  const layout   = document.getElementById('optLayout').value;
+  const fontSize = parseInt(fontSizeSlider.value);
+  const textPos  = document.getElementById('optTextPos').value;
+  const outWidth = parseInt(document.getElementById('optSize').value);
+
+  const [imgYes, imgBut] = await Promise.all([loadImage(state.yes), loadImage(state.but)]);
+
+  const canvas = document.getElementById('resultCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Each panel is a square of half the total width (horizontal) or half height (vertical)
+  const panel = outWidth / 2;
+
+  if (layout === 'horizontal') {
+    canvas.width  = outWidth;
+    canvas.height = panel;
+  } else {
+    canvas.width  = panel;
+    canvas.height = outWidth;
+  }
+
+  // Draw helper: cover-fit image into a rect
+  function drawCover(img, x, y, w, h) {
+    const scale = Math.max(w / img.width, h / img.height);
+    const sw = img.width  * scale;
+    const sh = img.height * scale;
+    const sx = x + (w - sw) / 2;
+    const sy = y + (h - sh) / 2;
+    ctx.drawImage(img, sx, sy, sw, sh);
+  }
+
+  // Clip regions
+  function drawPanel(img, x, y, w, h, label, color) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.clip();
+    drawCover(img, x, y, w, h);
+
+    // Dark gradient overlay for text readability
+    const isTop = textPos === 'topleft';
+    const isCenter = textPos === 'center';
+    let grad;
+    if (isCenter) {
+      grad = ctx.createRadialGradient(x + w/2, y + h/2, 0, x + w/2, y + h/2, Math.max(w,h) * 0.6);
+      grad.addColorStop(0, 'rgba(0,0,0,0.45)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    } else {
+      const gy0 = isTop ? y : y + h * 0.5;
+      const gy1 = isTop ? y + h * 0.55 : y + h;
+      grad = ctx.createLinearGradient(x, gy0, x, gy1);
+      grad.addColorStop(0, 'rgba(0,0,0,0.55)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    }
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, w, h);
+
+    // Text position
+    let tx, ty;
+    const pad = fontSize * 0.55;
+    if (textPos === 'center') {
+      tx = x + w / 2; ty = y + h / 2;
+    } else if (textPos === 'topleft') {
+      tx = x + pad; ty = y + pad + fontSize * 0.8;
+    } else {
+      tx = x + pad; ty = y + h - pad;
+    }
+
+    // Shadow
+    ctx.shadowColor = 'rgba(0,0,0,0.7)';
+    ctx.shadowBlur = fontSize * 0.3;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = fontSize * 0.06;
+
+    // Text stroke
+    ctx.font = `900 ${fontSize}px -apple-system, 'Helvetica Neue', Arial, sans-serif`;
+    ctx.textAlign = textPos === 'center' ? 'center' : 'left';
+    ctx.textBaseline = textPos === 'center' ? 'middle' : 'alphabetic';
+    ctx.lineWidth = fontSize * 0.08;
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.strokeText(label, tx, ty);
+
+    // Text fill
+    ctx.fillStyle = color;
+    ctx.fillText(label, tx, ty);
+
+    ctx.restore();
+  }
+
+  if (layout === 'horizontal') {
+    drawPanel(imgYes, 0,     0, panel, panel, 'YES', '#4ade80');
+    drawPanel(imgBut, panel, 0, panel, panel, 'BUT', '#f97316');
+
+    // Divider line
+    ctx.save();
+    ctx.strokeStyle = '#0f0f0f';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(panel, 0);
+    ctx.lineTo(panel, canvas.height);
+    ctx.stroke();
+    ctx.restore();
+  } else {
+    drawPanel(imgYes, 0, 0,     panel, panel, 'YES', '#4ade80');
+    drawPanel(imgBut, 0, panel, panel, panel, 'BUT', '#f97316');
+
+    ctx.save();
+    ctx.strokeStyle = '#0f0f0f';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, panel);
+    ctx.lineTo(canvas.width, panel);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  const section = document.getElementById('resultSection');
+  section.classList.add('visible');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// --- Save ---
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const canvas = document.getElementById('resultCanvas');
+  const a = document.createElement('a');
+  a.download = 'yes-but.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+});
+</script>
+</body>
+</html>

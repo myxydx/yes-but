@@ -575,7 +575,7 @@ function resizeCanvas() {
   canvas.height = layout === 'horizontal' ? outSize / 2 : outSize;
 }
 
-function render() {
+function render(forExport = false) {
   resizeCanvas();
   ctx.fillStyle = '#111';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -597,8 +597,8 @@ function render() {
   ctx.stroke();
   ctx.restore();
 
-  // label mode indicator dots
-  if (mode === 'label') {
+  // label selection indicator — preview only, never exported
+  if (mode === 'label' && !forExport) {
     ['yes','but'].forEach(key => {
       if (!panels[key].img) return;
       const r  = getPanelRect(key);
@@ -770,7 +770,9 @@ const saveModal = document.getElementById('saveModal');
 const modalImg  = document.getElementById('modalImg');
 
 function openModal() {
+  render(true);
   modalImg.src = canvas.toDataURL('image/png');
+  render();
   saveModal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }

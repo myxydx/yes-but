@@ -277,6 +277,85 @@
     text-align: center;
   }
 
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    gap: 16px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-img-wrap {
+    max-width: 100%;
+    max-height: 75vh;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.8);
+  }
+
+  .modal-img-wrap img {
+    display: block;
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    -webkit-touch-callout: default;
+  }
+
+  .modal-hint {
+    font-size: 0.9rem;
+    color: #aaa;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .modal-hint strong { color: #fff; }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .modal-close {
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: 1px solid #444;
+    background: transparent;
+    color: #aaa;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .modal-close:hover { border-color: #666; color: #fff; }
+
+  .modal-dl {
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: none;
+    background: #fff;
+    color: #000;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .modal-dl:hover { opacity: 0.85; }
+
+  /* hide desktop download on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .modal-dl { display: none; }
+  }
+
   @media (max-width: 480px) {
     h1 { font-size: 1.8rem; }
     .upload-row { gap: 10px; }
@@ -355,8 +434,22 @@
   <div class="result-canvas-wrap">
     <canvas id="resultCanvas"></canvas>
   </div>
-  <button class="save-btn" id="saveBtn">⬇ 保存图片</button>
-  <p class="tip">手机用户：长按图片可保存到相册</p>
+  <button class="save-btn" id="saveBtn">保存图片</button>
+</div>
+
+<!-- Save modal -->
+<div class="modal-overlay" id="saveModal">
+  <div class="modal-img-wrap">
+    <img id="modalImg" alt="YES/BUT">
+  </div>
+  <p class="modal-hint">
+    <strong>手机：</strong>长按图片 → 存到相册<br>
+    <strong>电脑：</strong>右键图片另存为，或点下载
+  </p>
+  <div class="modal-actions">
+    <button class="modal-close" id="modalClose">关闭</button>
+    <button class="modal-dl" id="modalDl">下载图片</button>
+  </div>
 </div>
 
 <script>
@@ -549,12 +642,30 @@ async function generate() {
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// --- Save ---
-document.getElementById('saveBtn').addEventListener('click', () => {
+// --- Save modal ---
+const saveModal = document.getElementById('saveModal');
+const modalImg  = document.getElementById('modalImg');
+
+function openSaveModal() {
   const canvas = document.getElementById('resultCanvas');
+  modalImg.src = canvas.toDataURL('image/png');
+  saveModal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSaveModal() {
+  saveModal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('saveBtn').addEventListener('click', openSaveModal);
+document.getElementById('modalClose').addEventListener('click', closeSaveModal);
+saveModal.addEventListener('click', e => { if (e.target === saveModal) closeSaveModal(); });
+
+document.getElementById('modalDl').addEventListener('click', () => {
   const a = document.createElement('a');
   a.download = 'yes-but.png';
-  a.href = canvas.toDataURL('image/png');
+  a.href = modalImg.src;
   a.click();
 });
 </script>
